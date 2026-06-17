@@ -5,9 +5,9 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.iskollect</groupId>
-    <artifactId>OOP_Complete_Project</artifactId>
+    <artifactId>iskollect-garbage-recycling-reward-system</artifactId>
     <version>1.0-SNAPSHOT</version>
-    <name>OOP_Complete_Project</name>
+    <name>ISKOllect Garbage Recycling Reward System</name>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -81,7 +81,7 @@
                         <id>default-cli</id>
                         <configuration>
                             <mainClass>
-                                com.iskollect.oop_complete_project/com.iskollect.Main
+                                com.iskollect/com.iskollect.Main
                             </mainClass>
                             <launcher>app</launcher>
                             <jlinkZipName>app</jlinkZipName>

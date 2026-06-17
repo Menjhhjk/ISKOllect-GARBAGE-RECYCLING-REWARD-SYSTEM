@@ -30,7 +30,7 @@ The system was developed as an Object-Oriented Programming project using a layer
 ## Project Structure
 
 ```text
-OOP_Complete_Project/
+ISKOllect-GARBAGE-RECYCLING-REWARD-SYSTEM/
 |-- pom.xml
 |-- mvnw
 |-- mvnw.cmd
@@ -125,7 +125,7 @@ Clone the repository or download the project folder.
 Open PowerShell or Command Prompt inside the project folder:
 
 ```text
-OOP_Complete_Project
+ISKOllect-GARBAGE-RECYCLING-REWARD-SYSTEM
 ```
 
 Install dependencies and build the project:
@@ -158,7 +158,7 @@ The login screen should appear after the application starts.
 
 ## Running from an IDE
 
-1. Open `OOP_Complete_Project` as a Maven project.
+1. Open the repository root as a Maven project.
 2. Wait for Maven dependencies to finish importing.
 3. Run the main class:
 

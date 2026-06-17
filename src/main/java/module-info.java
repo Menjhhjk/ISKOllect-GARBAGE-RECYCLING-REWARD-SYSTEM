@@ -1,4 +1,4 @@
-module com.iskollect.oop_complete_project {
+module com.iskollect {
     requires jbcrypt;
     requires javafx.controls;
     requires javafx.fxml;

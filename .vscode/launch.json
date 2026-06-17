@@ -3,11 +3,18 @@
     "configurations": [
         {
             "type": "java",
+            "name": "Main",
+            "request": "launch",
+            "mainClass": "com.iskollect/com.iskollect.Main",
+            "projectName": "OOP_Complete_Project"
+        },
+        {
+            "type": "java",
             "name": "Debug Iskollect",
             "request": "launch",
             "mainClass": "com.iskollect.Main",
-            "projectName": "OOP_Complete_Project",
-            "cwd": "${workspaceFolder}\\OOP_complete_updated\\OOP_Complete_Project"
+            "projectName": "iskollect-garbage-recycling-reward-system",
+            "cwd": "${workspaceFolder}"
         }
     ]
 }

@@ -9,7 +9,7 @@
                 "javafx:run"
             ],
             "options": {
-                "cwd": "${workspaceFolder}\\OOP_complete_updated\\OOP_Complete_Project"
+                "cwd": "${workspaceFolder}"
             },
             "group": {
                 "kind": "build",
@@ -26,7 +26,7 @@
                 "compile"
             ],
             "options": {
-                "cwd": "${workspaceFolder}\\OOP_complete_updated\\OOP_Complete_Project"
+                "cwd": "${workspaceFolder}"
             },
             "group": "build",
             "problemMatcher": "$javac"
