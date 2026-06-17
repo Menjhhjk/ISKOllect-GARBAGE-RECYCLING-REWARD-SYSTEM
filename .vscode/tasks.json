@@ -1,0 +1,35 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Run Iskollect (Maven JavaFX)",
+            "type": "shell",
+            "command": ".\\mvnw.cmd",
+            "args": [
+                "javafx:run"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}\\OOP_complete_updated\\OOP_Complete_Project"
+            },
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Compile Iskollect",
+            "type": "shell",
+            "command": ".\\mvnw.cmd",
+            "args": [
+                "-DskipTests",
+                "compile"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}\\OOP_complete_updated\\OOP_Complete_Project"
+            },
+            "group": "build",
+            "problemMatcher": "$javac"
+        }
+    ]
+}
