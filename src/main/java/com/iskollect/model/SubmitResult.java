@@ -9,9 +9,11 @@ public final class SubmitResult {
     private final double totalPoints;
     private final String newBadgeTier;
     private final int currentStreak;
+    private final String badgeJustEarned;
 
     public SubmitResult(boolean success, String message, double basePoints, double streakBonus,
-                        double badgeBonus, double totalPoints, String newBadgeTier, int currentStreak) {
+                        double badgeBonus, double totalPoints, String newBadgeTier, int currentStreak,
+                        String badgeJustEarned) {
         this.success = success;
         this.message = message;
         this.basePoints = basePoints;
@@ -20,10 +22,11 @@ public final class SubmitResult {
         this.totalPoints = totalPoints;
         this.newBadgeTier = newBadgeTier;
         this.currentStreak = currentStreak;
+        this.badgeJustEarned = badgeJustEarned;
     }
 
     public static SubmitResult failure(String message) {
-        return new SubmitResult(false, message, 0, 0, 0, 0, null, 0);
+        return new SubmitResult(false, message, 0, 0, 0, 0, null, 0, null);
     }
 
     public boolean isSuccess() { return success; }
@@ -34,4 +37,5 @@ public final class SubmitResult {
     public double getTotalPoints() { return totalPoints; }
     public String getNewBadgeTier() { return newBadgeTier; }
     public int getCurrentStreak() { return currentStreak; }
+    public String getBadgeJustEarned() { return badgeJustEarned; }
 }

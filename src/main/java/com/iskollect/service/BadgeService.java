@@ -114,7 +114,8 @@ public class BadgeService {
 
         for (BadgeResult badge : getBadgeTiers()) {
             int level = getBadgeLevel(badge);
-            if ((newBottleCount > 0 && level == 1) || (level > previousLevel && level <= newLevel)) {
+            if ((previousBottleCount == 0 && newBottleCount > 0 && level == 1)
+                    || (level > previousLevel && level <= newLevel)) {
                 if (awardWeeklyBadge(userId, badge)) {
                     awarded.add(badge);
                 }

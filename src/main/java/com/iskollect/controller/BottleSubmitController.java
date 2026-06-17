@@ -71,7 +71,14 @@ public class BottleSubmitController {
             msg.append(" + ").append(formatPoints(result.getBadgeBonus())).append(" badge bonus");
         }
         msg.append(" = ").append(formatPoints(result.getTotalPoints())).append(" pts total.");
-        msg.append(" Badge: ").append(result.getNewBadgeTier());
+        if (result.getBadgeJustEarned() != null) {
+            msg.append("\nBadge Unlocked: ").append(result.getBadgeJustEarned()).append("!");
+            if (result.getBadgeBonus() > 0) {
+                msg.append(" (+").append(formatPoints(result.getBadgeBonus())).append(" bonus pts)");
+            }
+        } else {
+            msg.append("\nBadge: ").append(result.getNewBadgeTier());
+        }
 
         SessionManager.notifyPointUpdate();
 

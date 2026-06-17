@@ -2,6 +2,63 @@
 
 This document summarizes the changes made in the latest development session. It is written as a focused changelog for advisor review.
 
+## 2026-06-17 7:24 PM (GMT+8) Teammate Update Merge
+
+### Session Scope
+
+This session reviewed the teammate update contained in `ISKOllect (6_17_2026)` and merged the relevant source changes into the current root repository while preserving the earlier repository-root cleanup and JavaFX 21 alignment.
+
+### Source Reviewed
+
+- `ISKOllect (6_17_2026)/DocumentationOfWhatChanged part 2.md`
+- `ISKOllect (6_17_2026)/OOP_Complete_filter_fixed_streak_badge_help/OOP_Complete_Project`
+
+The teammate project copy still used the older nested `OOP_Complete_Project` packaging, old Maven/module identifiers, and several FXML files saved with JavaFX 26 namespaces. Those packaging differences were treated as source-copy artifacts and were not reintroduced into the root project.
+
+### Changes Merged
+
+- Added `badgeJustEarned` tracking to `SubmitResult`.
+- Updated `BottleService` so it records which badge tier was newly unlocked during a bottle submission.
+- Updated `BottleSubmitController` so the popup success message distinguishes between:
+  - a newly unlocked badge, and
+  - the member's current badge when no promotion occurred.
+- Updated `BadgeService.awardReachedBadges` so Bronze is only considered newly reached when the user moves from zero lifetime bottles to at least one bottle.
+- Merged the Submit Bottles popup status-label layout update:
+  - wider centered status label,
+  - bold status text,
+  - adjusted safety note spacing.
+- Kept the bottle count field prompt text as `Bottle count (e.g., 12)` because the teammate documentation said that placeholder was intended.
+- Fixed a leftover VS Code launch configuration entry so it uses the current root project name and workspace root.
+
+### Preserved From Current Root Project
+
+- Kept Maven artifact/name as the current repository/project name.
+- Kept the Java module as `com.iskollect`.
+- Kept the JavaFX Maven plugin main class as:
+
+```text
+com.iskollect/com.iskollect.Main
+```
+
+- Kept all active FXML files on JavaFX 21:
+
+```text
+xmlns="http://javafx.com/javafx/21"
+```
+
+- Did not copy the nested update folder into the active source tree.
+
+### Verification Performed
+
+The following commands completed successfully:
+
+```powershell
+.\mvnw.cmd -q -DskipTests package
+.\mvnw.cmd -q test
+```
+
+Additional checks confirmed all active FXML files still use JavaFX 21. Searches for old nested-folder/module strings only matched historical notes in this session log, not active source/config files.
+
 ## 2026-06-17 Repository Root Cleanup and JavaFX 21 Alignment
 
 ### Session Scope

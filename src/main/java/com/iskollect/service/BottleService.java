@@ -74,10 +74,12 @@ public class BottleService {
                     + " totalPoints_after_streak=" + user.getTotalPoints());
 
             BadgeService.BadgeResult badge = badgeService.evaluateBadgeForBottles(newBottleTotal);
-            double badgeBonus = 0;
-            if (!badgeService.awardReachedBadges(userId, previousBottleTotal, newBottleTotal).isEmpty()) {
-                badgeBonus = badge.getBonusPoints();
-            }
+            List<BadgeService.BadgeResult> awardedBadges =
+                    badgeService.awardReachedBadges(userId, previousBottleTotal, newBottleTotal);
+            String badgeJustEarned = awardedBadges.isEmpty()
+                    ? null
+                    : awardedBadges.get(awardedBadges.size() - 1).getTierName();
+            double badgeBonus = badgeJustEarned != null ? badge.getBonusPoints() : 0;
             System.out.println("DEBUG [BottleService] badge=" + badge.getTierName()
                     + " badgeBonus=" + badgeBonus);
 
@@ -109,7 +111,7 @@ public class BottleService {
 
             return new SubmitResult(true, "Bottle submission recorded.",
                     basePoints, streakBonus, badgeBonus, totalPoints,
-                    badge.getTierName(), user.getStreak());
+                    badge.getTierName(), user.getStreak(), badgeJustEarned);
 
         } catch (DatabaseException e) {
             System.err.println("DEBUG [BottleService] DatabaseException: " + e.getMessage());
