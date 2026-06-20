@@ -43,6 +43,7 @@ public class RegisterController {
         }
 
         if (signUpButton != null) signUpButton.setDisable(true);
+        errorLabel.setStyle("-fx-text-fill: gray;");
         errorLabel.setText("Creating account...");
 
         String name  = nameField.getText().trim();
@@ -57,9 +58,16 @@ public class RegisterController {
                     if (signUpButton != null) signUpButton.setDisable(false);
                     if (success) goToLogin();
                 });
-            } catch (InvalidInputException | DatabaseException e) {
+            } catch (InvalidInputException e) {
                 Platform.runLater(() -> {
                     if (signUpButton != null) signUpButton.setDisable(false);
+                    errorLabel.setStyle("-fx-text-fill: red;");
+                    errorLabel.setText(e.getMessage());
+                });
+            } catch (DatabaseException e) {
+                Platform.runLater(() -> {
+                    if (signUpButton != null) signUpButton.setDisable(false);
+                    errorLabel.setStyle("-fx-text-fill: red;");
                     errorLabel.setText(e.getMessage());
                 });
             }

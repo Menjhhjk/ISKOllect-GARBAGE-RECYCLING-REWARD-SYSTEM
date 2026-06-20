@@ -12,6 +12,7 @@ public class StreakDAO {
         return DBConnection.getInstance().getConnection();
     }
 
+    //checks if the user has a streak
     public boolean streakExists(int userId) throws DatabaseException {
         String sql = "SELECT 1 FROM streaks WHERE user_id = ? LIMIT 1";
         try (Connection connection = conn();
@@ -25,6 +26,7 @@ public class StreakDAO {
         }
     }
 
+    //inserts a streak into the current user
     public void logStreak(int userId, int streakDays, double bonusPoints) throws DatabaseException {
         String sql = "INSERT INTO streaks (user_id, streak_days, bonus_points, date_logged) VALUES (?, ?, ?, ?)";
         try (PreparedStatement ps = DBConnection.getInstance().getConnection().prepareStatement(sql)) {
@@ -38,6 +40,7 @@ public class StreakDAO {
         }
     }
 
+    //checks the user's streak before today
     public int currentConsecutiveDaysBeforeToday(int userId, LocalDate today) throws DatabaseException {
         String sql = "SELECT DISTINCT collection_date FROM bottle_records "
                 + "WHERE user_id = ? AND collection_date < ? ORDER BY collection_date DESC";
@@ -63,6 +66,7 @@ public class StreakDAO {
         }
     }
 
+    //checks if the streak bonus has already been awarded
     public boolean hasStreakBonusLogged(int userId, int streakDays, LocalDate today) throws DatabaseException {
         String sql = "SELECT 1 FROM streaks WHERE user_id = ? AND streak_days = ? "
                 + "AND date_logged::date = ? LIMIT 1";
@@ -78,6 +82,7 @@ public class StreakDAO {
         }
     }
 
+    //checks the user's streak today
     public int currentConsecutiveDays(int userId, LocalDate today) throws DatabaseException {
         String sql = "SELECT DISTINCT collection_date FROM bottle_records "
                 + "WHERE user_id = ? AND collection_date <= ? ORDER BY collection_date DESC";

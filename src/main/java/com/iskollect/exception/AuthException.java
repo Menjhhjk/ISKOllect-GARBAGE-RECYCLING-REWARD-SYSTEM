@@ -1,6 +1,6 @@
 package com.iskollect.exception;
 
-// DEPENDS ON: registration module
+//for authentication failures or errors
 public class AuthException extends Exception {
     public AuthException(String message) {
         super(message);

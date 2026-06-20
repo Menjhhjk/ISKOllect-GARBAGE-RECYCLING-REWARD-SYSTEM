@@ -231,7 +231,7 @@ public class ProfileController {
             setField(usernameField, newUsername);
             setProfileStatus("Profile updated successfully.", false);
         } catch (DatabaseException e) {
-            setProfileStatus("Failed to update profile: " + e.getMessage(), true);
+            setProfileStatus(e.getMessage(), true);
         }
     }
 
@@ -280,7 +280,7 @@ public class ProfileController {
             confirmPasswordField.setStyle("");
             setPasswordStatus("Password updated successfully.", false);
         } catch (DatabaseException e) {
-            setPasswordStatus("Password update failed: " + e.getMessage(), true);
+            setPasswordStatus(e.getMessage(), true);
         }
     }
 
@@ -424,7 +424,7 @@ public class ProfileController {
         }
     }
 
-    // ── Navigation ────────────────────────────────────────────────────────
+    //navigation
     @FXML private void goToDashboard()          { loadScreen("dashboard.fxml"); }
     @FXML private void goToBottleRecords()      { loadScreen("bottlerecords.fxml"); }
     @FXML private void goToRewardsCatalog()     { loadScreen("rewardsCatalog.fxml"); }

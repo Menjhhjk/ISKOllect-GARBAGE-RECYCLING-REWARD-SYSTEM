@@ -7,10 +7,12 @@ import java.util.List;
 public class ActivityHistory {
     private final List<Object> entries;
 
+    //constructor
     public ActivityHistory(List<Object> entries) {
         this.entries = Collections.unmodifiableList(new ArrayList<>(entries));
     }
 
+    //getters
     public List<Object> getEntries() {
         return entries;
     }

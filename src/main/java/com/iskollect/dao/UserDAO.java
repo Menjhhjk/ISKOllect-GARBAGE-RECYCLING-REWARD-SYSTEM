@@ -20,6 +20,7 @@ public class UserDAO {
         return DBConnection.getInstance().getConnection();
     }
 
+    //
     private void ensureDisplayNameColumn() throws SQLException {
         try (Statement st = conn().createStatement()) {
             st.executeUpdate("ALTER TABLE users ADD COLUMN IF NOT EXISTS display_name VARCHAR(50)");
@@ -37,6 +38,7 @@ public class UserDAO {
         }
     }
 
+
     private String userSelect(String whereClause) {
         return "SELECT u.*, "
                 + "COALESCE((SELECT SUM(br.bottles_collected) FROM bottle_records br "
@@ -49,6 +51,7 @@ public class UserDAO {
                 + "FROM users u " + whereClause;
     }
 
+    //inserts a new user into the database
     public boolean registerUser(User user) throws DatabaseException {
         String sql = "INSERT INTO users (username, display_name, email, password_hash, created_at) "
                 + "VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP)";
@@ -74,10 +77,24 @@ public class UserDAO {
             return true;
             }
         } catch (SQLException e) {
-            throw new DatabaseException("Failed to register user.", e);
+            // PostgreSQL unique-violation SQLState is always "23505".
+            // Auto-generated constraint names from the schema:
+            //   email    → users_email_key
+            //   username → users_username_key
+            if ("23505".equals(e.getSQLState())) {
+                String msg = e.getMessage() != null ? e.getMessage().toLowerCase() : "";
+                if (msg.contains("users_email_key") || msg.contains("\"email\"")) {
+                    throw new DatabaseException("This webmail address is already registered. Please log in or use a different address.", e);
+                } else if (msg.contains("users_username_key") || msg.contains("\"username\"")) {
+                    throw new DatabaseException("This username is already taken. Please choose a different one.", e);
+                }
+                throw new DatabaseException("An account with these details already exists.", e);
+            }
+            throw new DatabaseException("Registration failed due to a database error. Please try again.", e);
         }
     }
 
+    //searches for a specific user from the database using inputted webmail
     public User searchUser(String webmail) throws DatabaseException {
         String sql = userSelect("WHERE LOWER(u.email) = LOWER(?)");
         try {
@@ -93,6 +110,7 @@ public class UserDAO {
         }
     }
 
+    //searches for a specific user from the database using an ID value
     public User findById(int userId) throws DatabaseException {
         String sql = userSelect("WHERE u.user_id = ?");
         try {
@@ -108,6 +126,7 @@ public class UserDAO {
         }
     }
 
+    //returns all user IDs from the database
     public List<Integer> getAllUserIds() throws DatabaseException {
         String sql = "SELECT user_id FROM users ORDER BY user_id";
         try (PreparedStatement ps = conn().prepareStatement(sql);
@@ -122,6 +141,7 @@ public class UserDAO {
         }
     }
 
+    //updates the user's session token in the database
     public void updateSessionToken(int userId, String token) throws DatabaseException {
         String sql = "UPDATE users SET session_token = ?, last_activity = CURRENT_TIMESTAMP WHERE user_id = ?";
         try (PreparedStatement ps = conn().prepareStatement(sql)) {
@@ -133,6 +153,7 @@ public class UserDAO {
         }
     }
 
+    //updates the user's last activity in the database
     public void updateLastActivity(int userId) throws DatabaseException {
         String sql = "UPDATE users SET last_activity = CURRENT_TIMESTAMP WHERE user_id = ?";
         try (PreparedStatement ps = conn().prepareStatement(sql)) {
@@ -143,6 +164,7 @@ public class UserDAO {
         }
     }
 
+    //returns the user's session token from the database
     public String getSessionTokenDB(int userId) {
         String sql = "SELECT session_token FROM users WHERE user_id = ?";
         try (PreparedStatement ps = conn().prepareStatement(sql)) {
@@ -155,6 +177,7 @@ public class UserDAO {
         }
     }
 
+    //updates the user's profile info (display name, username, age) in the database
     public void updateProfile(int userId, String displayName, String username, int age) throws DatabaseException {
         String sql = "UPDATE users SET display_name = ?, username = ?, age = ? WHERE user_id = ?";
         try {
@@ -167,10 +190,18 @@ public class UserDAO {
             ps.executeUpdate();
             }
         } catch (SQLException e) {
-            throw new DatabaseException("Failed to update profile.", e);
+            if ("23505".equals(e.getSQLState())) {
+                String msg = e.getMessage() != null ? e.getMessage().toLowerCase() : "";
+                if (msg.contains("users_username_key") || msg.contains("\"username\"")) {
+                    throw new DatabaseException("That username is already taken.", e);
+                }
+                throw new DatabaseException("A profile conflict occurred. Please check your details and try again.", e);
+            }
+            throw new DatabaseException("Could not save profile changes. Please try again.", e);
         }
     }
 
+    //updates the user's profile photo path in the database
     public void updateProfilePicture(int userId, String imagePath) throws DatabaseException {
         String sql = "UPDATE users SET profile_photo = ? WHERE user_id = ?";
         try (PreparedStatement ps = conn().prepareStatement(sql)) {
@@ -182,6 +213,7 @@ public class UserDAO {
         }
     }
 
+    //updates the user's total points in the database
     public void updatePoints(int userId, double totalPoints) throws DatabaseException {
         String sql = "UPDATE users SET total_points = ? WHERE user_id = ?";
         try (PreparedStatement ps = conn().prepareStatement(sql)) {
@@ -193,6 +225,7 @@ public class UserDAO {
         }
     }
 
+    //deducts the user's points in the database by the inputted amount
     public boolean deductPointsAtomic(int userId, double amount) throws DatabaseException {
         String sql = "UPDATE users SET total_points = total_points - ? WHERE user_id = ? AND total_points >= ?";
         try (PreparedStatement ps = conn().prepareStatement(sql)) {
@@ -205,6 +238,7 @@ public class UserDAO {
         }
     }
 
+    //updates the user's weekly stats (raw bottle count)
     public void updateWeeklyStats(int userId, int weeklyBottles, int streak, java.time.LocalDate lastSubmitDate)
             throws DatabaseException {
         String sql = "UPDATE users SET raw_bottle_count = "
@@ -219,19 +253,18 @@ public class UserDAO {
         }
     }
 
+    //resets the user's weekly stats (streak days, last submit date) in the database
     public void resetWeeklyStats(int userId) throws DatabaseException {
-        String sql = "UPDATE users SET raw_bottle_count = "
-                + "(SELECT COALESCE(SUM(bottles_collected), 0) FROM bottle_records WHERE user_id = ?) "
-                + "WHERE user_id = ?";
+        String sql = "UPDATE users SET streak_days = 0, last_submit_date = NULL WHERE user_id = ?";
         try (PreparedStatement ps = conn().prepareStatement(sql)) {
             ps.setInt(1, userId);
-            ps.setInt(2, userId);
             ps.executeUpdate();
         } catch (SQLException e) {
             throw new DatabaseException("Failed to reset weekly stats.", e);
         }
     }
 
+    //updates the user's password in the database
     public void updatePasswordHash(int userId, String newHash) throws DatabaseException {
         String sql = "UPDATE users SET password_hash = ? WHERE user_id = ?";
         try (PreparedStatement ps = conn().prepareStatement(sql)) {
@@ -239,10 +272,11 @@ public class UserDAO {
             ps.setInt(2, userId);
             ps.executeUpdate();
         } catch (SQLException e) {
-            throw new DatabaseException("Failed to update password hash.", e);
+            throw new DatabaseException("Could not update your password. Please try again.", e);
         }
     }
 
+    //formats a row from the database into a User object
     private User map(ResultSet rs) throws SQLException {
         User user = new User();
         user.setUserId(rs.getInt("user_id"));
@@ -250,8 +284,6 @@ public class UserDAO {
         user.setName(readString(rs, "display_name", user.getUsername()));
         user.setWebmail(rs.getString("email"));
         user.setPassword(rs.getString("password_hash"));
-        user.setCourse("");
-        user.setYearLevel(0);
         user.setAge(readInt(rs, "age", 0));
         user.setProfilePhoto(readString(rs, "profile_photo", null));
         user.setTotalPoints(readDouble(rs, "total_points", 0));
@@ -260,8 +292,6 @@ public class UserDAO {
         user.setStreak(readInt(rs, "streak", 0));
         Date lastSubmitDate = readDate(rs, "last_submit_date");
         user.setLastSubmitDate(lastSubmitDate == null ? null : lastSubmitDate.toLocalDate());
-        user.setAccountStatus(readString(rs, "account_status", "active"));
-        user.setFailedLoginAttempts(readInt(rs, "failed_login_attempts", 0));
         user.setSessionToken(readString(rs, "session_token", null));
         java.sql.Timestamp activity = readTimestamp(rs, "last_activity");
         if (activity != null) {
@@ -274,6 +304,7 @@ public class UserDAO {
         return user;
     }
 
+    //checks the columns of the database
     private boolean hasColumn(ResultSet rs, String column) throws SQLException {
         for (int i = 1; i <= rs.getMetaData().getColumnCount(); i++) {
             if (column.equalsIgnoreCase(rs.getMetaData().getColumnName(i))) {

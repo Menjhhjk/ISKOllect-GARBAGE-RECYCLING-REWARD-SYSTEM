@@ -11,6 +11,7 @@ public final class SubmitResult {
     private final int currentStreak;
     private final String badgeJustEarned;
 
+    //constructor
     public SubmitResult(boolean success, String message, double basePoints, double streakBonus,
                         double badgeBonus, double totalPoints, String newBadgeTier, int currentStreak,
                         String badgeJustEarned) {
@@ -29,6 +30,7 @@ public final class SubmitResult {
         return new SubmitResult(false, message, 0, 0, 0, 0, null, 0, null);
     }
 
+    //getters
     public boolean isSuccess() { return success; }
     public String getMessage() { return message; }
     public double getBasePoints() { return basePoints; }

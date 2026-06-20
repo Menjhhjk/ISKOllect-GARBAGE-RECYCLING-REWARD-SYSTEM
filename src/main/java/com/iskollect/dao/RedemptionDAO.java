@@ -18,6 +18,7 @@ public class RedemptionDAO {
         return DBConnection.getInstance().getConnection();
     }
 
+    //inserts a redemption made into the database
     public boolean insert(Redemption r) throws DatabaseException {
         String sql = "INSERT INTO redemptions "
                 + "(user_id, coupon_id, redemption_date, coupon_code, status) "
@@ -40,6 +41,7 @@ public class RedemptionDAO {
         }
     }
 
+    //returns all redemptions made by a user by using user ID
     public List<Redemption> getByUserId(int userId) throws DatabaseException {
         String sql = "SELECT rd.*, c.coupon_name, c.points_required AS points_deducted "
                 + "FROM redemptions rd JOIN coupons c ON rd.coupon_id = c.coupon_id "
@@ -52,6 +54,7 @@ public class RedemptionDAO {
         }
     }
 
+    //updates a redemption's status to "claimed"
     public void markFulfilled(int redemptionId) throws DatabaseException {
         String sql = "UPDATE redemptions SET status = 'claimed' WHERE redemption_id = ?";
         try (PreparedStatement ps = conn().prepareStatement(sql)) {
@@ -62,6 +65,7 @@ public class RedemptionDAO {
         }
     }
 
+    //returns a redemption made by a user using its coupon code
     public Redemption findByCouponCode(String code) throws DatabaseException {
         String sql = "SELECT rd.*, c.coupon_name, c.points_required AS points_deducted "
                 + "FROM redemptions rd JOIN coupons c ON rd.coupon_id = c.coupon_id "
@@ -76,6 +80,7 @@ public class RedemptionDAO {
         }
     }
 
+    //formats database data into a redemption list
     private List<Redemption> collect(PreparedStatement ps) throws SQLException {
         List<Redemption> redemptions = new ArrayList<>();
         try (ResultSet rs = ps.executeQuery()) {
@@ -86,6 +91,7 @@ public class RedemptionDAO {
         return redemptions;
     }
 
+    //formats database data into a Redemption object
     private Redemption map(ResultSet rs) throws SQLException {
         Redemption coupon = new Redemption(
                 rs.getInt("redemption_id"),

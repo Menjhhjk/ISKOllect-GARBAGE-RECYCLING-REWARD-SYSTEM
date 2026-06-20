@@ -20,6 +20,7 @@ public class SecurityCheck {
     private final UserDAO userDAO = new UserDAO();
     private final InOutLogDAO inOutLogDAO = new InOutLogDAO();
 
+    //checks if there is user logged in
     public boolean isSessionValid() {
         User currentUser = SessionManager.getSession();
 
@@ -56,6 +57,7 @@ public class SecurityCheck {
         }
     }
 
+    //checks the user's inactivity
     private boolean isSessionExpired(LocalDateTime lastActivity) {
         if (lastActivity == null) {
             return false;
@@ -64,6 +66,7 @@ public class SecurityCheck {
         return minutesIdle >= MAX_INACTIVITY_MINUTES;
     }
 
+    //forces the user to logout
     private void handleForcedLogout(int userId) {
         try {
             userDAO.updateSessionToken(userId, null);

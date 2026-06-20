@@ -13,6 +13,7 @@ public class BottleRecord {
     private LocalDate date;
     private String displayDate;
 
+    //constructors
     public BottleRecord() {
     }
 
@@ -28,6 +29,7 @@ public class BottleRecord {
         this.date = date;
     }
 
+    //getters and setters
     public int getRecordId() { return recordId; }
     public void setRecordId(int recordId) { this.recordId = recordId; }
     public int getUserId() { return userId; }
@@ -47,6 +49,7 @@ public class BottleRecord {
     public String getDisplayDate() { return displayDate; }
     public void setDisplayDate(String displayDate) { this.displayDate = displayDate; }
 
+    //convert to String
     @Override
     public String toString() {
         return "BottleRecord{recordId=" + recordId + ", userId=" + userId + ", bottles="

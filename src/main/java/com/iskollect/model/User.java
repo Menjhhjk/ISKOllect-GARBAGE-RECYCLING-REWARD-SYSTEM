@@ -9,8 +9,6 @@ public class User {
     private String username;
     private String webmail;
     private String password;
-    private String course;
-    private int yearLevel;
     private int age;
     private String profilePhoto;
     private double totalPoints;
@@ -18,11 +16,12 @@ public class User {
     private int weeklyBottles;
     private int streak;
     private LocalDate lastSubmitDate;
-    private String accountStatus;
-    private int failedLoginAttempts = 0;
     private String sessionToken;
     private LocalDateTime lastActivity;
     private LocalDateTime createdAt;
+
+    //constructors
+    public User() {}
 
     //for login
     public User(int id, String webmail, String password) {
@@ -42,7 +41,7 @@ public class User {
     //complete User info
     public User(int userId, String username, String webmail, String password,
                    int age, String profilePhoto, double totalPoints,
-                   int rawBottleCount, String accountStatus, int failedLoginAttempts,
+                   int rawBottleCount,
                    String sessionToken, LocalDateTime lastActivity) {
         this.userId = userId;
         this.username = username;
@@ -52,16 +51,11 @@ public class User {
         this.profilePhoto = profilePhoto;
         this.totalPoints = totalPoints;
         this.rawBottleCount = rawBottleCount;
-        this.accountStatus = accountStatus;
-        this.failedLoginAttempts = failedLoginAttempts;
         this.sessionToken = sessionToken;
         this.lastActivity = lastActivity;
     }
 
-    public User() {}
-
     //getters and setters
-    //userId
     public int getUserId() {
         return userId;
     }
@@ -72,12 +66,10 @@ public class User {
     public String getName() {
         return name != null && !name.isBlank() ? name : username;
     }
-
     public void setName(String name) {
         this.name = name;
     }
 
-    //username
     public String getUsername() {
         return username;
     }
@@ -85,7 +77,6 @@ public class User {
         this.username = username;
     }
 
-    //webmail
     public String getWebmail() {
         return webmail;
     }
@@ -93,7 +84,6 @@ public class User {
         this.webmail = webmail;
     }
 
-    //password
     public String getPassword() {
         return password;
     }
@@ -101,23 +91,6 @@ public class User {
         this.password = password;
     }
 
-    public String getCourse() {
-        return course;
-    }
-
-    public void setCourse(String course) {
-        this.course = course;
-    }
-
-    public int getYearLevel() {
-        return yearLevel;
-    }
-
-    public void setYearLevel(int yearLevel) {
-        this.yearLevel = yearLevel;
-    }
-
-    //age
     public int getAge() {
         return age;
     }
@@ -125,7 +98,6 @@ public class User {
         this.age = age;
     }
 
-    //photo
     public String getProfilePhoto() {
         return profilePhoto;
     }
@@ -133,7 +105,6 @@ public class User {
         this.profilePhoto = profilePhoto;
     }
 
-    //total pts
     public double getTotalPoints() {
         return totalPoints;
     }
@@ -141,7 +112,6 @@ public class User {
         this.totalPoints = totalPoints;
     }
 
-    //raw bottle count
     public int getRawBottleCount() {
         return rawBottleCount;
     }
@@ -152,7 +122,6 @@ public class User {
     public int getWeeklyBottles() {
         return weeklyBottles;
     }
-
     public void setWeeklyBottles(int weeklyBottles) {
         this.weeklyBottles = weeklyBottles;
     }
@@ -160,7 +129,6 @@ public class User {
     public int getStreak() {
         return streak;
     }
-
     public void setStreak(int streak) {
         this.streak = streak;
     }
@@ -168,34 +136,16 @@ public class User {
     public LocalDate getLastSubmitDate() {
         return lastSubmitDate;
     }
-
     public void setLastSubmitDate(LocalDate lastSubmitDate) {
         this.lastSubmitDate = lastSubmitDate;
     }
 
-    //account status
-    public String getAccountStatus() {
-        return accountStatus;
-    }
-    public void setAccountStatus(String accountStatus) {
-        this.accountStatus = accountStatus;
-    }
-
-    //failed login attempts
-    public int getFailedLoginAttempts() {
-        return failedLoginAttempts;
-    }
-    public void setFailedLoginAttempts(int failedLoginAttempts) {
-        this.failedLoginAttempts = failedLoginAttempts;
-    }
-
-    //session token
-    public String getSessionToken() { return sessionToken; }
+    public String getSessionToken() {
+        return sessionToken; }
     public void setSessionToken(String sessionToken) {
         this.sessionToken = sessionToken;
     }
 
-    //last activity
     public LocalDateTime getLastActivity() {
         return lastActivity;
     }
@@ -206,7 +156,6 @@ public class User {
     public LocalDateTime getCreatedAt() {
         return createdAt;
     }
-
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
     }

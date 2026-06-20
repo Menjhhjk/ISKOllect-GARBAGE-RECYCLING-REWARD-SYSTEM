@@ -19,6 +19,7 @@ public class BottleRecordDAO {
         return DBConnection.getInstance().getConnection();
     }
 
+    //inserts a new log into bottle_records
     public boolean insert(BottleRecord t) throws DatabaseException {
         String sql = "INSERT INTO bottle_records "
                 + "(user_id, bottles_collected, collection_date, week_start_date) "
@@ -40,6 +41,7 @@ public class BottleRecordDAO {
         }
     }
 
+    //returns all bottle records from a user
     public List<BottleRecord> getByUserId(int userId) throws DatabaseException {
         String sql = "SELECT br.record_id, br.user_id, br.bottles_collected, br.collection_date, "
                 + "COALESCE(SUM(pl.points_change) FILTER (WHERE pl.points_change > 0), 0) AS points "
@@ -57,6 +59,7 @@ public class BottleRecordDAO {
         }
     }
 
+    //returns all bottle records from a user within a data range
     public List<BottleRecord> getByDateRange(int userId, LocalDate from, LocalDate to) throws DatabaseException {
         String sql = "SELECT br.record_id, br.user_id, br.bottles_collected, br.collection_date, "
                 + "COALESCE(SUM(pl.points_change) FILTER (WHERE pl.points_change > 0), 0) AS points "
@@ -76,6 +79,7 @@ public class BottleRecordDAO {
         }
     }
 
+    //returns the total bottles collected of a user
     public int getTotalBottles(int userId) throws DatabaseException {
         String sql = "SELECT COALESCE(SUM(bottles_collected), 0) FROM bottle_records WHERE user_id = ?";
         try (PreparedStatement ps = conn().prepareStatement(sql)) {
@@ -88,6 +92,7 @@ public class BottleRecordDAO {
         }
     }
 
+    //returns the total points of a user
     public double getTotalPoints(int userId) throws DatabaseException {
         String sql = "SELECT COALESCE(SUM(points_change), 0) FROM points_ledger WHERE user_id = ?";
         try (PreparedStatement ps = conn().prepareStatement(sql)) {
@@ -100,6 +105,7 @@ public class BottleRecordDAO {
         }
     }
 
+    //formats database data into a BottleRecord object
     private List<BottleRecord> collect(PreparedStatement ps) throws SQLException {
         List<BottleRecord> bottleRecords = new ArrayList<>();
         try (ResultSet rs = ps.executeQuery()) {
@@ -110,6 +116,7 @@ public class BottleRecordDAO {
         return bottleRecords;
     }
 
+    //formats database data into a BottleRecord object
     private BottleRecord map(ResultSet rs) throws SQLException {
         double points = rs.getDouble("points");
         return new BottleRecord(

@@ -244,7 +244,7 @@ public class BottleRecordsController {
         }
     }
 
-    // ── Filter buttons ─────────────────────────────────────────────────────
+    //filters
     @FXML private void filterAll() {
         if (submissionTable != null) {
             submissionTable.setItems(allData);
@@ -354,7 +354,7 @@ public class BottleRecordsController {
         return daysAgo + " days ago";
     }
 
-    // ── Popups ─────────────────────────────────────────────────────────────
+    //popups
     @FXML
     private void openBadgeHistory() {
         try {
@@ -386,7 +386,7 @@ public class BottleRecordsController {
         }
     }
 
-    // ── Navigation ─────────────────────────────────────────────────────────
+    //navigation
     @FXML private void goToDashboard()          { loadScreen("dashboard.fxml"); }
     @FXML private void goToRewardsCatalog()     { loadScreen("rewardsCatalog.fxml"); }
     @FXML private void goToTransactionHistory() { loadScreen("transactionhistory.fxml"); }

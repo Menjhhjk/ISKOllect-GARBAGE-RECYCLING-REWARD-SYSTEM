@@ -24,6 +24,7 @@ public class CouponService {
     private final UserDAO userDAO = new UserDAO();
     private final PointsLedgerDAO pointsLedgerDAO = new PointsLedgerDAO();
 
+    //returns all coupons
     public List<Coupon> getAllCoupons() {
         try {
             return couponDAO.getAll();
@@ -33,6 +34,7 @@ public class CouponService {
         }
     }
 
+    //for redeeming rewards
     public RedeemResult redeem(int userId, int couponId) {
         Connection conn = DBConnection.getInstance().getConnection();
         try {
@@ -46,15 +48,21 @@ public class CouponService {
                 throw new InsufficientPointsException("Insufficient points for selected coupon.");
             }
 
+            //generates a random coupon code
             String couponCode = CouponGenerator.generate();
+
+            //creates a Redemption object with the inputted values
             Redemption redemption = new Redemption(0, userId, couponId, LocalDate.now(),
                     couponCode, false, coupon.getPointsRequired());
+
+            //inserts data into the database
             redemptionDAO.insert(redemption);
             pointsLedgerDAO.insert(userId, -coupon.getPointsRequired(), "redemption", redemption.getRedemptionId());
             double remainingPoints = user.getTotalPoints() - coupon.getPointsRequired();
             userDAO.updatePoints(userId, remainingPoints);
             conn.commit();
 
+            //returns a log of the redeem
             return new RedeemResult(true, "Coupon redemption.", couponCode, coupon.getName(),
                     coupon.getPointsRequired(), remainingPoints);
         } catch (InsufficientPointsException | DatabaseException | SQLException e) {
@@ -65,6 +73,7 @@ public class CouponService {
         }
     }
 
+    //getter (returns the bought rewards history)
     public List<Redemption> getRedemptionHistory(int userId) {
         try {
             return redemptionDAO.getByUserId(userId);
@@ -73,6 +82,7 @@ public class CouponService {
         }
     }
 
+    //rolls back the database
     private void rollback(Connection conn) {
         try {
             conn.rollback();
@@ -80,6 +90,7 @@ public class CouponService {
         }
     }
 
+    //enables auto commit
     private void restoreAutoCommit(Connection conn) {
         try {
             conn.setAutoCommit(true);

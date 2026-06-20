@@ -15,6 +15,7 @@ public final class ReportResult {
     private final String errorMessage;
     private final boolean success;
 
+    //constructor
     private ReportResult(String reportType, List<Map<String, Object>> rows,
                          Map<String, Object> totals, String errorMessage, boolean success) {
         this.reportType = reportType;
@@ -35,6 +36,7 @@ public final class ReportResult {
         return new ReportResult(type, List.of(), Map.of(), errorMessage, false);
     }
 
+    //getters
     public String getReportType() { return reportType; }
     public LocalDateTime getGeneratedAt() { return generatedAt; }
     public List<Map<String, Object>> getRows() { return rows; }

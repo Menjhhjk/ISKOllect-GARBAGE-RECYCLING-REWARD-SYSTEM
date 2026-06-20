@@ -52,10 +52,15 @@ public class LoginController {
                         errorLabel.setText("Incorrect webmail or password.");
                     }
                 });
-            } catch (InvalidInputException | DatabaseException e) {
+            } catch (InvalidInputException e) {
                 Platform.runLater(() -> {
                     if (loginButton != null) loginButton.setDisable(false);
                     errorLabel.setText(e.getMessage());
+                });
+            } catch (DatabaseException e) {
+                Platform.runLater(() -> {
+                    if (loginButton != null) loginButton.setDisable(false);
+                    errorLabel.setText("A system error occurred. Please try again.");
                 });
             }
         });

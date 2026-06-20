@@ -11,20 +11,22 @@ public class PointsService {
     private final BottleRecordDAO bottleRecordDAO;
     private final PointsLedgerDAO pointsLedgerDAO;
 
+    //constructors
     public PointsService() {
         this(new UserDAO(), new BottleRecordDAO());
     }
-
     public PointsService(UserDAO userDAO, BottleRecordDAO bottleRecordDAO) {
         this.userDAO = userDAO;
         this.bottleRecordDAO = bottleRecordDAO;
         this.pointsLedgerDAO = new PointsLedgerDAO();
     }
 
+    //calculates the base points from a submission
     public double calculateBasePoints(int bottles) {
         return bottles * 0.5;
     }
 
+    //getter
     public double getTotalPoints(int userId) {
         try {
             User user = userDAO.findById(userId);
@@ -34,6 +36,7 @@ public class PointsService {
         }
     }
 
+    //deducts the user's points
     public boolean deductPoints(int userId, double amount) {
         if (amount < 0) {
             return false;
@@ -45,6 +48,7 @@ public class PointsService {
         }
     }
 
+    //updates the user's total points based on the user's points ledger
     public void recalculatePoints(int userId) {
         try {
             User user = userDAO.findById(userId);

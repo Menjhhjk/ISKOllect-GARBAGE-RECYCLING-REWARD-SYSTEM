@@ -12,6 +12,7 @@ public class Redemption {
     private double pointsDeducted;
     private String couponName;
 
+    //constructors
     public Redemption() {
     }
 
@@ -26,6 +27,7 @@ public class Redemption {
         this.pointsDeducted = pointsDeducted;
     }
 
+    //getters and setters
     public int getRedemptionId() { return redemptionId; }
     public void setRedemptionId(int redemptionId) { this.redemptionId = redemptionId; }
     public int getUserId() { return userId; }
@@ -43,6 +45,7 @@ public class Redemption {
     public String getCouponName() { return couponName; }
     public void setCouponName(String couponName) { this.couponName = couponName; }
 
+    //convert to String
     @Override
     public String toString() {
         return "Redemption{redemptionId=" + redemptionId + ", userId=" + userId

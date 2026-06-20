@@ -14,6 +14,7 @@ public class PointsLedgerDAO {
         return DBConnection.getInstance().getConnection();
     }
 
+    //inserts a points log into points_ledger
     public int insert(int userId, double pointsChange, String source, Integer refId) throws DatabaseException {
         String sql = "INSERT INTO points_ledger (user_id, points_change, source, ref_id) VALUES (?, ?, ?, ?)";
         try (PreparedStatement ps = conn().prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
@@ -34,6 +35,7 @@ public class PointsLedgerDAO {
         }
     }
 
+    //returns a user's total points by summing up the logs in the points_ledger for that user
     public double getBalance(int userId) throws DatabaseException {
         String sql = "SELECT COALESCE(SUM(points_change), 0) FROM points_ledger WHERE user_id = ?";
         try (PreparedStatement ps = conn().prepareStatement(sql)) {

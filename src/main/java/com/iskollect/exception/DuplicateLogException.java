@@ -1,9 +1,6 @@
 package com.iskollect.exception;
 
-/**
- * Thrown by InOutService when a log attempt is rejected due to
- * a duplicate event within the configured duplicate-window.
- */
+//for errors due to duplicate entries
 public class DuplicateLogException extends Exception {
 
     private final int existingLogId;
@@ -13,7 +10,6 @@ public class DuplicateLogException extends Exception {
         this.existingLogId = existingLogId;
     }
 
-    /** The logId of the existing conflicting record. */
     public int getExistingLogId() {
         return existingLogId;
     }

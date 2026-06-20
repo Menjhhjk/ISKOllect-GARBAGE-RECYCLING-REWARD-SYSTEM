@@ -9,6 +9,7 @@ import java.io.IOException;
 
 public class RedirectUtil {
 
+    //redirects the user to the login page
     public static void redirectToLogin(Stage stage) {
         try {
             java.net.URL url = RedirectUtil.class.getResource("/com/iskollect/fxml/login.fxml");

@@ -215,7 +215,7 @@ public class TransactionController {
         return String.format(Locale.US, "%.2f", points);
     }
 
-    // ── Navigation ────────────────────────────────────────────────────────
+    //navigation
     @FXML private void goToDashboard()          { loadScreen("dashboard.fxml"); }
     @FXML private void goToBottleRecords()      { loadScreen("bottlerecords.fxml"); }
     @FXML private void goToRewardsCatalog()     { loadScreen("rewardsCatalog.fxml"); }

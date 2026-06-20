@@ -20,6 +20,7 @@ public class ActivityHistoryService {
     private final BottleRecordDAO bottleRecordDAO = new BottleRecordDAO();
     private final RedemptionDAO redemptionDAO = new RedemptionDAO();
 
+    //returns the complete history
     public ActivityHistory getFullHistory(int userId) {
         try {
             List<Object> entries = new ArrayList<>();
@@ -32,6 +33,7 @@ public class ActivityHistoryService {
         }
     }
 
+    //returns the filtered history
     public ActivityHistory getFilteredHistory(int userId, HistoryFilter filter) {
         LocalDate today = LocalDate.now();
         LocalDate from;
@@ -55,6 +57,7 @@ public class ActivityHistoryService {
         return new ActivityHistory(filtered);
     }
 
+    //returns the date of either a BottleRecord or Redemption object
     private LocalDate entryDate(Object entry) {
         if (entry instanceof BottleRecord) {
             return ((BottleRecord) entry).getDate();

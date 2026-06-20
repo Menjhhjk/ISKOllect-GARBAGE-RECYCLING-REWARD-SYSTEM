@@ -144,7 +144,7 @@ public class RewardsController {
         return String.format(Locale.US, "%.2f", points);
     }
 
-    // ── Navigation ────────────────────────────────────────────────────────
+    //navigation
     @FXML
     private void openAddBottle() {
         try {

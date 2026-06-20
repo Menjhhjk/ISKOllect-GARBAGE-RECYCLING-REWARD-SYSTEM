@@ -2,13 +2,6 @@ package com.iskollect.model;
 
 import java.time.LocalDateTime;
 
-/**
- * Represents a single ingress or egress event logged by staff.
- *
- * NOTE: user_id is stored as a plain int with no FK enforcement yet.
- * The foreign key constraint to the users table will be added once
- * the User & Device Registration Module is complete.
- */
 public class InOutLog {
     private int logId;
     private int userId;
@@ -16,6 +9,7 @@ public class InOutLog {
     private LocalDateTime timestamp;
     private String staffNote;
 
+    //enums to force the use of constant values
     public enum EventType {
         LOGIN,
         LOGOUT,
@@ -35,6 +29,7 @@ public class InOutLog {
         UNRESOLVED
     }
 
+    //constructors
     public InOutLog() {
     }
 
@@ -55,6 +50,7 @@ public class InOutLog {
         this.staffNote = staffNote;
     }
 
+    //getters and setters
     public int getLogId() { return logId; }
     public void setLogId(int logId) { this.logId = logId; }
     public int getUserId() { return userId; }
@@ -70,6 +66,7 @@ public class InOutLog {
     public LogStatus getStatus() { return LogStatus.VALID; }
     public void setStatus(LogStatus status) { }
 
+    //convert to String
     @Override
     public String toString() {
         return String.format("InOutLog{logId=%d, userId=%d, action=%s, performedAt=%s}",

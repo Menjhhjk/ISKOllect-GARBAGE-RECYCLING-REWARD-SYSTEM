@@ -17,6 +17,8 @@ import java.util.List;
 import java.util.Map;
 
 public class ReportService {
+
+    //returns the user's bottle summary from a certain date range
     public ReportResult getBottleSummary(int userId, LocalDate from, LocalDate to) {
         String type = "BOTTLE_SUMMARY";
         try {
@@ -37,20 +39,7 @@ public class ReportService {
         }
     }
 
-    public ReportResult getWeeklyLeaderboard() {
-        String type = "WEEKLY_LEADERBOARD";
-        try {
-            String sql = "SELECT u.user_id, u.username AS name, "
-                    + "COALESCE(SUM(br.bottles_collected), 0) AS weekly_bottles "
-                    + "FROM users u LEFT JOIN bottle_records br ON u.user_id = br.user_id "
-                    + "AND br.week_start_date = DATE_TRUNC('week', CURRENT_DATE)::date "
-                    + "GROUP BY u.user_id, u.username ORDER BY weekly_bottles DESC, name ASC";
-            return ReportResult.success(type, query(sql), Map.of());
-        } catch (SQLException e) {
-            return ReportResult.failure(type, e.getMessage());
-        }
-    }
-
+    //returns the user's points from a certain date range
     public ReportResult getPointsLedger(int userId, LocalDate from, LocalDate to) {
         String type = "POINTS_LEDGER";
         try {
@@ -68,6 +57,7 @@ public class ReportService {
         }
     }
 
+    //returns the user's redeemed rewards
     public ReportResult getRedemptionReport(Boolean fulfilledOnly) {
         String type = "REDEMPTION_REPORT";
         try {
@@ -84,6 +74,7 @@ public class ReportService {
         }
     }
 
+    //returns a report based on the user's activity
     public ReportResult getSystemSummary() {
         String type = "SYSTEM_SUMMARY";
         try {
@@ -98,6 +89,7 @@ public class ReportService {
         }
     }
 
+    //validation for user ID and date ranges
     private void validateUserAndDates(int userId, LocalDate from, LocalDate to) throws InvalidInputException {
         if (userId <= 0) {
             throw new InvalidInputException("userId must be greater than zero.");
@@ -114,6 +106,7 @@ public class ReportService {
         return from.isBefore(LocalDate.now().minusYears(2));
     }
 
+    //query for selecting from the database
     private List<Map<String, Object>> query(String sql, Object... params) throws SQLException {
         Connection conn = DBConnection.getInstance().getConnection();
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -135,6 +128,7 @@ public class ReportService {
         }
     }
 
+    //formats data to rows for tables
     private List<Map<String, Object>> rows(ResultSet rs) throws SQLException {
         List<Map<String, Object>> rows = new ArrayList<>();
         ResultSetMetaData meta = rs.getMetaData();

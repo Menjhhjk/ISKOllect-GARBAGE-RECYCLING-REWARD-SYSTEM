@@ -22,6 +22,7 @@ public class BottleService {
     private final StreakService   streakService;
     private final BadgeService    badgeService;
 
+    //constructor for creating a BottleService object
     public BottleService() {
         UserDAO         sharedUserDAO         = new UserDAO();
         BottleRecordDAO sharedBottleRecordDAO = new BottleRecordDAO();
@@ -36,6 +37,7 @@ public class BottleService {
         this.badgeService    = new BadgeService(sharedUserDAO);
     }
 
+    //for submitting bottle submissions
     public SubmitResult submitBottles(int userId, int bottleCount) {
         if (bottleCount <= 0) {
             return SubmitResult.failure("Bottle count must be greater than zero.");
@@ -61,6 +63,7 @@ public class BottleService {
             int previousBottleTotal = user.getRawBottleCount();
             int newBottleTotal = previousBottleTotal + bottleCount;
 
+            //records the current submission
             BottleRecord bottleRecord = new BottleRecord(
                     0, userId, bottleCount,
                     basePoints, 0, 0, 0,
@@ -68,14 +71,19 @@ public class BottleService {
             bottleRecordDAO.insert(bottleRecord);
             System.out.println("DEBUG [BottleService] bottleRecord inserted, recordId=" + bottleRecord.getRecordId());
 
+            //calculates the submission's streak bonus
             double streakBonus = streakService.evaluateStreak(user, bottleCount);
             System.out.println("DEBUG [BottleService] streakBonus=" + streakBonus
                     + " streak_after=" + user.getStreak()
                     + " totalPoints_after_streak=" + user.getTotalPoints());
 
-            BadgeService.BadgeResult badge = badgeService.evaluateBadgeForBottles(newBottleTotal);
+            int previousWeeklyBottles = user.getWeeklyBottles();
+            int newWeeklyBottles = user.getWeeklyBottles();
+
+            //calculates the submission's badge bonus
+            BadgeService.BadgeResult badge = badgeService.evaluateBadgeForBottles(newWeeklyBottles);
             List<BadgeService.BadgeResult> awardedBadges =
-                    badgeService.awardReachedBadges(userId, previousBottleTotal, newBottleTotal);
+                    badgeService.awardReachedBadges(userId, previousWeeklyBottles, newWeeklyBottles);
             String badgeJustEarned = awardedBadges.isEmpty()
                     ? null
                     : awardedBadges.get(awardedBadges.size() - 1).getTierName();
@@ -83,23 +91,27 @@ public class BottleService {
             System.out.println("DEBUG [BottleService] badge=" + badge.getTierName()
                     + " badgeBonus=" + badgeBonus);
 
+            //records the points for the current submission
             pointsLedgerDAO.insert(userId, basePoints, "bottle", bottleRecord.getRecordId());
             if (badgeBonus > 0) {
                 pointsLedgerDAO.insert(userId, badgeBonus, "badge", bottleRecord.getRecordId());
             }
 
+            //updates the user's total points in the database
             double additionalPoints = basePoints + badgeBonus;
             double newTotal = user.getTotalPoints() + additionalPoints;
             userDAO.updatePoints(userId, newTotal);
             user.setTotalPoints(newTotal);
             System.out.println("DEBUG [BottleService] final totalPoints=" + newTotal);
 
+            //updates the user's weekly stats
             userDAO.updateWeeklyStats(userId,
                     user.getWeeklyBottles(),
                     user.getStreak(),
                     user.getLastSubmitDate());
             user.setRawBottleCount(newBottleTotal);
 
+            //updates the bottle record's recorded points
             double totalPoints = basePoints + streakBonus + badgeBonus;
             bottleRecord.setPoints(totalPoints);
             bottleRecord.setStreakBonus(streakBonus);
@@ -120,6 +132,7 @@ public class BottleService {
         }
     }
 
+    //returns the user's bottle submission history
     public List<BottleRecord> getBottleHistory(int userId) {
         try {
             return bottleRecordDAO.getByUserId(userId);

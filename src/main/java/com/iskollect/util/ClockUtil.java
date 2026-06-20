@@ -14,6 +14,7 @@ public final class ClockUtil {
 
     private ClockUtil() {}
 
+    //starts the timer
     public static void startClock(Label label) {
         if (label == null) return;
 

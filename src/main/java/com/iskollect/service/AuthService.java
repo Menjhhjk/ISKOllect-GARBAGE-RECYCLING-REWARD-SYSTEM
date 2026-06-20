@@ -16,6 +16,7 @@ import java.time.LocalDateTime;
 import java.util.regex.Pattern;
 
 public class AuthService {
+    //necessary info for validation
     private static final String PUP_WEBMAIL_DOMAIN = "@iskolarngbayan.pup.edu.ph";
     private static final Pattern WEBMAIL_PATTERN =
             Pattern.compile("^[A-Za-z0-9][A-Za-z0-9._-]{1,63}" + Pattern.quote(PUP_WEBMAIL_DOMAIN) + "$");
@@ -23,11 +24,13 @@ public class AuthService {
     private final UserDAO userDAO;
     private final InOutLogDAO inOutLogDAO;
 
+    //constructor for an AuthService object
     public AuthService() {
         this.userDAO = new UserDAO();
         this.inOutLogDAO = new InOutLogDAO();
     }
 
+    //for registering a user
     public boolean register(User user)
             throws DatabaseException, InvalidInputException {
 
@@ -39,6 +42,7 @@ public class AuthService {
         String displayName = user.getUsername().trim();
         String webmail = user.getWebmail().trim();
 
+        //validation for inputs
         if (!isValidWebmail(webmail)) {
             throw new InvalidInputException("Please use a valid PUP webmail address.");
         }
@@ -51,6 +55,7 @@ public class AuthService {
         user.setName(displayName);
         user.setUsername(username);
 
+        //password validation
         if (user.getPassword().trim().length() < 8) {
             throw new InvalidInputException("Password must be at least 8 characters long.");
         }
@@ -101,6 +106,7 @@ public class AuthService {
 
     public void logout() throws DatabaseException {
         User currentUser = SessionManager.getSession();
+
         //clears the session and current token
         if (currentUser != null) {
             userDAO.updateSessionToken(currentUser.getUserId(), null);
@@ -109,10 +115,12 @@ public class AuthService {
         SessionManager.clearSession();
     }
 
+    //checks if the inputted webmail is valid
     private boolean isValidWebmail(String webmail) {
         return webmail != null && WEBMAIL_PATTERN.matcher(webmail.trim()).matches();
     }
 
+    //logs the current activity
     private void logActivity(int userId, EventType eventType, String note) {
         try {
             InOutLog log = new InOutLog(

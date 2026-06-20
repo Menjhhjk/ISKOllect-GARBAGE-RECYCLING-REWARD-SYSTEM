@@ -8,6 +8,7 @@ public final class RedeemResult {
     private final double pointsDeducted;
     private final double remainingPoints;
 
+    //constructor
     public RedeemResult(boolean success, String message, String couponCode, String couponName,
                         double pointsDeducted, double remainingPoints) {
         this.success = success;
@@ -22,6 +23,7 @@ public final class RedeemResult {
         return new RedeemResult(false, message, null, null, 0, 0);
     }
 
+    //getters
     public boolean isSuccess() { return success; }
     public String getMessage() { return message; }
     public String getCouponCode() { return couponCode; }

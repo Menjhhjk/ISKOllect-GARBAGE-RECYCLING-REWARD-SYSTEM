@@ -13,6 +13,7 @@ public class SessionManager {
     private static final BottleRecordDAO bottlerecordDAO = new BottleRecordDAO();
     private static final List<Runnable> pointUpdateListeners = new ArrayList<>();
 
+    //sets the user's session token when they login
     public static synchronized void setSession(User user) {
         if (user != null) {
             String token = java.util.UUID.randomUUID().toString();
@@ -21,6 +22,7 @@ public class SessionManager {
         loggedInUser = user;
     }
 
+    //refreshes the user's points and bottle count
     public static void refreshUserSession() {
         User user = getSession();
         if (user != null) {
@@ -35,12 +37,12 @@ public class SessionManager {
         }
     }
 
+    //stores and updates user's points and bottle count for other classes
     public static synchronized void addPointUpdateListener(Runnable listener) {
         if (listener != null && !pointUpdateListeners.contains(listener)) {
             pointUpdateListeners.add(listener);
         }
     }
-
     public static void notifyPointUpdate() {
         refreshUserSession();
         List<Runnable> listeners;
@@ -54,8 +56,10 @@ public class SessionManager {
         }
     }
 
+    //returns the current user
     public static User getSession() { return loggedInUser; }
 
+    //clears the session
     public static synchronized void clearSession() {
         loggedInUser = null;
         pointUpdateListeners.clear();

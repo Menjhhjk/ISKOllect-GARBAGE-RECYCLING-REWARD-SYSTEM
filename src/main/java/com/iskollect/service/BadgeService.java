@@ -15,18 +15,20 @@ import java.util.List;
 public class BadgeService {
     private final UserDAO userDAO;
 
+    //constructors for a BadgeService object
     public BadgeService() {
         this(new UserDAO());
     }
-
     public BadgeService(UserDAO userDAO) {
         this.userDAO = userDAO;
     }
 
+    //evaluates the badges
     public BadgeResult evaluateBadge(int weeklyBottles) {
         return evaluateBadgeForBottles(weeklyBottles);
     }
 
+    //returns a badge based on the number of submitted bottles
     public BadgeResult evaluateBadgeForBottles(int bottleCount) {
         if (bottleCount >= 31) {
             return new BadgeResult("Constellation", 10);
@@ -43,15 +45,17 @@ public class BadgeService {
         return new BadgeResult("Bronze", 0);
     }
 
+    //gets the user's current badge
     public BadgeResult getCurrentBadge(int userId) {
         try {
             User user = userDAO.findById(userId);
-            return user == null ? new BadgeResult("Bronze", 0) : evaluateBadgeForBottles(user.getRawBottleCount());
+            return user == null ? new BadgeResult("Bronze", 0) : evaluateBadgeForBottles(user.getWeeklyBottles());
         } catch (DatabaseException e) {
             return new BadgeResult("Bronze", 0);
         }
     }
 
+    //gets the user's current badge level
     public int getBadgeLevel(BadgeResult badge) {
         if (badge == null || badge.getTierName() == null) {
             return 0;
@@ -66,6 +70,7 @@ public class BadgeService {
         }
     }
 
+    //resets the user's weekly stats
     public void resetWeeklyData(int userId) {
         try {
             userDAO.resetWeeklyStats(userId);
@@ -74,10 +79,12 @@ public class BadgeService {
         }
     }
 
+    //awards based on user's badge
     public boolean awardWeeklyBadge(int userId, BadgeResult badge) throws DatabaseException {
         return awardBadge(userId, badge, LocalDate.now());
     }
 
+    //awards the user with a badge
     private boolean awardBadge(int userId, BadgeResult badge, LocalDate dateAwarded) throws DatabaseException {
         String sql = "INSERT INTO user_badges (user_id, badge_id, date_awarded, week_start_date) "
                 + "SELECT ?, badge_id, ?, DATE_TRUNC('week', ?::date)::date "
@@ -98,6 +105,7 @@ public class BadgeService {
         }
     }
 
+    //
     public boolean awardBadgeOnPromotion(int userId, BadgeResult previousBadge, BadgeResult newBadge)
             throws DatabaseException {
         if (getBadgeLevel(newBadge) <= getBadgeLevel(previousBadge)) {
@@ -124,6 +132,7 @@ public class BadgeService {
         return awarded;
     }
 
+    //badge tiers
     public List<BadgeResult> getBadgeTiers() {
         return List.of(
                 new BadgeResult("Bronze", 0),
@@ -134,6 +143,7 @@ public class BadgeService {
         );
     }
 
+    //returns the user's badge history
     public List<BadgeHistoryEntry> getBadgeHistory(int userId, int limit) {
         syncEarnedBadgeHistory(userId);
         String sql = "SELECT b.badge_name, ub.date_awarded, ub.week_start_date, "
@@ -164,6 +174,7 @@ public class BadgeService {
         return result;
     }
 
+    //returns complete badge history
     public List<BadgeHistoryEntry> getAllBadgeHistory(int userId) {
         syncEarnedBadgeHistory(userId);
         String sql = "SELECT b.badge_name, ub.date_awarded, ub.week_start_date, "
@@ -192,6 +203,7 @@ public class BadgeService {
         return result;
     }
 
+    //updates the user's badge data to ensure accuracy
     private void syncEarnedBadgeHistory(int userId) {
         String sql = "WITH running AS ("
                 + "SELECT collection_date, "
@@ -216,6 +228,7 @@ public class BadgeService {
         }
     }
 
+    //needed values (bottles) to earn each badge
     private int getBadgeThreshold(String tierName) {
         switch (tierName) {
             case "Silver":        return 6;
@@ -250,15 +263,18 @@ public class BadgeService {
         public int       getTotalBottles()  { return totalBottles; }
     }
 
+    //seperate class
     public static final class BadgeResult {
         private final String tierName;
         private final double bonusPoints;
 
+        //constructor for creating a BadgeResult object
         public BadgeResult(String tierName, double bonusPoints) {
             this.tierName = tierName;
             this.bonusPoints = bonusPoints;
         }
 
+        //getters
         public String getTierName()    { return tierName; }
         public double getBonusPoints() { return bonusPoints; }
     }

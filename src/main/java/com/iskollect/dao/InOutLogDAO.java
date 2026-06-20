@@ -12,30 +12,9 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Data Access Object for the inout_logs table.
- *
- * All queries use PreparedStatements to prevent SQL injection.
- * No business logic lives here — only CRUD and query operations.
- *
- * ── DDL (run once to create the table) ────────────────────────────────
- *
- *   CREATE TABLE inout_logs (
- *       log_id       INTEGER       GENERATED ALWAYS AS IDENTITY,
- *       user_id      INT           NOT NULL,
- *       log_id       SERIAL PRIMARY KEY,
- *       user_id      INTEGER       NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
- *       action       VARCHAR(50)   NOT NULL,   -- LOGIN | LOGOUT | SESSION_TIMEOUT | LOCK
- *       performed_at TIMESTAMP     DEFAULT NOW(),
- *       ip_address   VARCHAR(45),
- *       notes        VARCHAR(255)
- *   );
- *
- * ──────────────────────────────────────────────────────────────────────
- */
 public class InOutLogDAO {
 
-    // ── SQL statements ────────────────────────────────────────────────────
+    //database queries or commands
 
     private static final String SQL_INSERT =
         "INSERT INTO inout_logs (user_id, action, performed_at, notes) VALUES (?, ?, ?, ?)";
@@ -72,21 +51,12 @@ public class InOutLogDAO {
     private static final String SQL_GET_BY_DATE =
         "SELECT * FROM inout_logs WHERE performed_at::date = ? ORDER BY performed_at DESC";
 
-    // ── Connection helper ─────────────────────────────────────────────────
-
     private Connection conn() {
         return DBConnection.getInstance().getConnection();
     }
 
-    // ── Write operations ──────────────────────────────────────────────────
 
-    /**
-     * Persists a new InOutLog to the database.
-     * Sets the auto-generated logId back onto the provided object.
-     *
-     * @param log the log to insert (logId will be populated after insert)
-     * @throws DatabaseException if the INSERT fails
-     */
+    //inserts a log into inoutlogs
     public void insert(InOutLog log) throws DatabaseException {
         try (PreparedStatement ps = conn().prepareStatement(SQL_INSERT, Statement.RETURN_GENERATED_KEYS)) {
             ps.setInt(1, log.getUserId());
@@ -105,27 +75,7 @@ public class InOutLogDAO {
         }
     }
 
-    /**
-     * Updates the status field of an existing log (e.g., UNRESOLVED → VALID
-     * after a user is registered retroactively).
-     *
-     * @param logId  the log to update
-     * @param status the new status
-     * @throws DatabaseException if the UPDATE fails
-     */
-    public void updateStatus(int logId, LogStatus status) throws DatabaseException {
-        // The Supabase inout_logs table has no status column.
-    }
-
-    // ── Read operations ───────────────────────────────────────────────────
-
-    /**
-     * Finds a single log by its primary key.
-     *
-     * @param logId the log_id to look up
-     * @return the matching InOutLog, or null if not found
-     * @throws DatabaseException on SQL error
-     */
+    //returns a log by its ID
     public InOutLog findById(int logId) throws DatabaseException {
         try (PreparedStatement ps = conn().prepareStatement(SQL_FIND_BY_ID)) {
             ps.setInt(1, logId);
@@ -137,13 +87,7 @@ public class InOutLogDAO {
         }
     }
 
-    /**
-     * Returns all logs for a given user, newest first.
-     *
-     * @param userId the user whose logs to retrieve
-     * @return list of InOutLog (may be empty)
-     * @throws DatabaseException on SQL error
-     */
+    //returns all logs of a user
     public List<InOutLog> getByUserId(int userId) throws DatabaseException {
         try (PreparedStatement ps = conn().prepareStatement(SQL_GET_BY_USER)) {
             ps.setInt(1, userId);
@@ -153,13 +97,7 @@ public class InOutLogDAO {
         }
     }
 
-    /**
-     * Returns all logs across all users, newest first.
-     * Used for staff overview / daily report.
-     *
-     * @return list of all InOutLog records
-     * @throws DatabaseException on SQL error
-     */
+    //returns all logs from all users
     public List<InOutLog> getAll() throws DatabaseException {
         try (PreparedStatement ps = conn().prepareStatement(SQL_GET_ALL)) {
             return collectResults(ps);
@@ -168,15 +106,7 @@ public class InOutLogDAO {
         }
     }
 
-    /**
-     * Returns logs for a user filtered to a date range (inclusive).
-     *
-     * @param userId target user
-     * @param from      start date (inclusive)
-     * @param to        end date (inclusive)
-     * @return filtered list, newest first
-     * @throws DatabaseException on SQL error
-     */
+    //returns all logs from a user by a data range
     public List<InOutLog> getByUserAndDateRange(int userId, LocalDate from, LocalDate to)
             throws DatabaseException {
         try (PreparedStatement ps = conn().prepareStatement(SQL_GET_BY_DATE_RANGE)) {
@@ -190,14 +120,7 @@ public class InOutLogDAO {
         }
     }
 
-    /**
-     * Returns the single most recent log for a user, regardless of type.
-     * Used by InOutService to determine the user's current in/out state.
-     *
-     * @param userId target user
-     * @return the most recent log, or null if no logs exist
-     * @throws DatabaseException on SQL error
-     */
+    //returns the recent log of a user
     public InOutLog getLastEvent(int userId) throws DatabaseException {
         try (PreparedStatement ps = conn().prepareStatement(SQL_GET_LAST_EVENT)) {
             ps.setInt(1, userId);
@@ -209,15 +132,7 @@ public class InOutLogDAO {
         }
     }
 
-    /**
-     * Returns the most recent log of a specific type (INGRESS or EGRESS) for a user.
-     * Used for duplicate detection.
-     *
-     * @param userId target user
-     * @param eventType the type to filter by
-     * @return the most recent log of the given type, or null
-     * @throws DatabaseException on SQL error
-     */
+    //returns the recent log of a user by a specific type
     public InOutLog getLastEventOfType(int userId, EventType eventType) throws DatabaseException {
         try (PreparedStatement ps = conn().prepareStatement(SQL_GET_LAST_EVENT_OF_TYPE)) {
             ps.setInt(1, userId);
@@ -230,16 +145,7 @@ public class InOutLogDAO {
         }
     }
 
-    /**
-     * Looks for an existing log of the same type within a time window.
-     * Used by InOutService to enforce the duplicate-window check.
-     *
-     * @param userId   target user
-     * @param eventType   type to check (INGRESS or EGRESS)
-     * @param windowStart the earliest timestamp to consider (now - window)
-     * @return the conflicting log if found, or null
-     * @throws DatabaseException on SQL error
-     */
+    //returns a log of the same type within a time window
     public InOutLog getRecentSameEvent(int userId, EventType eventType, LocalDateTime windowStart)
             throws DatabaseException {
         try (PreparedStatement ps = conn().prepareStatement(SQL_GET_RECENT_SAME_EVENT)) {
@@ -255,14 +161,7 @@ public class InOutLogDAO {
         }
     }
 
-    /**
-     * Returns all logs recorded on a specific calendar date.
-     * Used for the daily summary report.
-     *
-     * @param date the date to filter by
-     * @return list of logs, newest first
-     * @throws DatabaseException on SQL error
-     */
+    //returns all logs from a specific day
     public List<InOutLog> getByDate(LocalDate date) throws DatabaseException {
         try (PreparedStatement ps = conn().prepareStatement(SQL_GET_BY_DATE)) {
             ps.setDate(1, Date.valueOf(date));
@@ -272,14 +171,7 @@ public class InOutLogDAO {
         }
     }
 
-    /**
-     * Returns the total number of log events recorded on a specific date.
-     * Useful for lightweight dashboard counts.
-     *
-     * @param date the date to count
-     * @return count of log records
-     * @throws DatabaseException on SQL error
-     */
+    //returns a count of all logs from a specific day
     public int countByDate(LocalDate date) throws DatabaseException {
         try (PreparedStatement ps = conn().prepareStatement(SQL_COUNT_BY_DATE)) {
             ps.setDate(1, Date.valueOf(date));
@@ -291,11 +183,7 @@ public class InOutLogDAO {
         }
     }
 
-    // ── Mapping helper ────────────────────────────────────────────────────
-
-    /**
-     * Maps a single ResultSet row to an InOutLog object.
-     */
+    //formats database data into an InOutLog object
     private InOutLog map(ResultSet rs) throws SQLException {
         return new InOutLog(
             rs.getInt("log_id"),
@@ -306,9 +194,7 @@ public class InOutLogDAO {
         );
     }
 
-    /**
-     * Executes a PreparedStatement and collects all rows into a List.
-     */
+    //formats database data into an InOutLog list
     private List<InOutLog> collectResults(PreparedStatement ps) throws SQLException {
         List<InOutLog> logs = new ArrayList<>();
         try (ResultSet rs = ps.executeQuery()) {

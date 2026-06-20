@@ -7,40 +7,21 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Properties;
 
-/**
- * Singleton JDBC connection manager for Iskollect.
- *
- * Reads connection credentials from config.properties (on the classpath).
- * Reconnects automatically if the stored connection has gone stale.
- *
- * config.properties keys:
- *   db.url      = jdbc:postgresql://localhost:5432/iskollect_db
- *   db.user     = <username>
- *   db.password = <password>
- *
- * Maven dependency (pom.xml):
- *   <dependency>
- *       <groupId>org.postgresql</groupId>
- *       <artifactId>postgresql</artifactId>
- *       <version>42.7.3</version>
- *   </dependency>
- */
 public class DBConnection {
 
     private static DBConnection instance;
     private Connection connection;
 
-    // ── Properties keys ───────────────────────────────────────────────────
+    //properties keys
     private static final String CONFIG_FILE  = "config.properties";
     private static final String KEY_URL      = "db.url";
     private static final String KEY_USER     = "db.user";
     private static final String KEY_PASS     = "db.password";
 
-    // ── PostgreSQL driver class ───────────────────────────────────────────
+    //PostgreSQL driver class
     private static final String PG_DRIVER    = "org.postgresql.Driver";
 
-    // ── Private constructor (Singleton) ───────────────────────────────────
-
+    //constructor
     private DBConnection() {
         try {
             Properties props = loadProperties();
@@ -63,21 +44,13 @@ public class DBConnection {
         }
     }
 
-    // ── Singleton accessor ────────────────────────────────────────────────
-
+    //accessors
     public static synchronized DBConnection getInstance() {
         if (instance == null) {
             instance = new DBConnection();
         }
         return instance;
     }
-
-    // ── Connection accessor ───────────────────────────────────────────────
-
-    /**
-     * Returns the active Connection. If the connection has gone stale
-     * (e.g., idle timeout), it is re-created transparently.
-     */
     public synchronized Connection getConnection() {
         try {
             if (connection == null || connection.isClosed() || !connection.isValid(3)) {
@@ -91,8 +64,7 @@ public class DBConnection {
         return connection;
     }
 
-    // ── Cleanup ───────────────────────────────────────────────────────────
-
+    //for closing the db connection
     public synchronized void closeConnection() {
         if (connection != null) {
             try {
@@ -108,8 +80,7 @@ public class DBConnection {
         }
     }
 
-    // ── Helpers ───────────────────────────────────────────────────────────
-
+    //returns the properties of the config file
     private Properties loadProperties() throws IOException {
         Properties props = new Properties();
         try (InputStream in = getClass().getClassLoader().getResourceAsStream(CONFIG_FILE)) {

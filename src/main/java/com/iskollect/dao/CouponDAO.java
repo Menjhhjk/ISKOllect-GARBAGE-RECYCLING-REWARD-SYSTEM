@@ -17,6 +17,7 @@ public class CouponDAO {
         return DBConnection.getInstance().getConnection();
     }
 
+    //returns all logged coupons
     public List<Coupon> getAll() throws DatabaseException {
         String sql = "SELECT * FROM coupons ORDER BY points_required ASC";
         try (PreparedStatement ps = conn().prepareStatement(sql);
@@ -31,6 +32,7 @@ public class CouponDAO {
         }
     }
 
+    //returns a specific coupon by searching using an ID
     public Coupon findById(int couponId) throws DatabaseException {
         String sql = "SELECT * FROM coupons WHERE coupon_id = ?";
         try (PreparedStatement ps = conn().prepareStatement(sql)) {
@@ -43,6 +45,7 @@ public class CouponDAO {
         }
     }
 
+    //inserts a new entry into coupons
     public boolean insert(Coupon r) throws DatabaseException {
         String sql = "INSERT INTO coupons (coupon_name, points_required) VALUES (?, ?)";
         try (PreparedStatement ps = conn().prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
@@ -60,6 +63,7 @@ public class CouponDAO {
         }
     }
 
+    //formats database data into a Coupon object
     private Coupon map(ResultSet rs) throws SQLException {
         return new Coupon(
                 rs.getInt("coupon_id"),
